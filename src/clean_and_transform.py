@@ -1,7 +1,6 @@
 import pandas as pd
-from airflow import Variable
+# from airflow import Variable
 import logging
-
 
 # Set up logging configuration
 logging.basicConfig(
@@ -75,15 +74,16 @@ def clean_and_transform_data():
         logging.info(f'Number of rows after dropping NA values: {num_rows_after}')
         logging.info(f'Number of rows dropped: {num_rows_dropped}')
 
-        return players_df
+        transformed_df_path = '../data/processed/fb_ref_players_processed.csv'
+
+        # Store the transformed df to the processed folder
+        players_df.to_csv(transformed_df_path)
+        logging.info(f'Successfully stored the data in data/processed')
+
     except Exception as e:
         logging.error(f'An unexpected error occurred while renaming columns: {e}')
         raise
 
 
 if __name__ == '__main__':
-    transformed_df = clean_and_transform_data()
-    transformed_df_path = '../data/processed/fb_ref_players_processed.csv'
-
-    # Store the transformed df to the processed folder
-    transformed_df.to_csv(transformed_df_path)
+    clean_and_transform_data()

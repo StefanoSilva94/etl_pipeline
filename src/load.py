@@ -1,8 +1,6 @@
 import logging
 import pandas as pd
-from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from airflow.models import Variable
 from database import engine
 
 
@@ -31,7 +29,7 @@ def insert_data_to_db(df: pd.DataFrame):
         raise
 
 
-def main():
+def load_data_to_tables():
     # Load processed data into dataframe
     processed_file_path = '../data/processed/fb_ref_players_processed.csv'
     df = load_data(processed_file_path)
@@ -39,4 +37,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    load_data_to_tables()

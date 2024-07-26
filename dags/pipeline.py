@@ -1,6 +1,8 @@
 from airflow.operators.python import PythonOperator
 from airflow import DAG
 from datetime import datetime, timedelta
+from src.clean_and_transform import clean_and_transform_data
+from src.load import load_data_to_tables
 
 default_args = {
     'owner': 'airflow',
@@ -19,12 +21,12 @@ with DAG(
 
     clean_data_task = PythonOperator(
         task_id='scrape_player_data_task',
-        python_callable=clean_player_data
+        python_callable=clean_and_transform_data
     )
 
     load_player_data_task = PythonOperator(
         task_id='load_player_data_task',
-        python_callable=load_player_data
+        python_callable=load_data_to_tables
     )
 
 
