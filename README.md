@@ -16,7 +16,7 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
 
 ### Prerequisites
 
-- Python 3
+- Python 3.8+ (required for Airflow)
 - PostgreSQL
 - Apache Airflow
 - Docker (optional, for containerization)
