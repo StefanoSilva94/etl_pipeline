@@ -46,6 +46,5 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
    Start Airflow and trigger the weekly_influenza_etl DAG to run the pipeline:
 
    ```bash
-   Copy code
    airflow webserver -p 8080
    airflow scheduler
