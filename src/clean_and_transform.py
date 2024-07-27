@@ -3,10 +3,6 @@ from airflow.models import Variable
 import logging
 import os
 import json
-from sqlalchemy.exc import SQLAlchemyError
-from models import PlayerStatsDB
-from database import engine
-from sqlalchemy.orm import Session
 
 
 # Set up logging configuration
