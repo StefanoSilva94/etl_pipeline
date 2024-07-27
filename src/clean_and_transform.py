@@ -3,6 +3,7 @@ from airflow.models import Variable
 import logging
 import os
 import json
+from utils.utils import send_file_to_archive, get_first_file_name
 
 
 # Set up logging configuration
@@ -17,7 +18,7 @@ def load_data(path):
         logging.info('Loading data into pandas DataFrame.')
         df = pd.read_csv(path)
         df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-        logging.info('Data loaded and date column parsed successfully.')
+        logging.info('Raw data loaded and date column parsed successfully.')
         return df
     except FileNotFoundError:
         logging.error(f'File not found: {path}')
@@ -75,7 +76,12 @@ def clean_and_transform_data():
     print(f'Current working directory: {current_path}')
 
     try:
-        players_path = f'../data/raw/fb_ref_players_2023_2024.csv'
+        # construct the file path
+        raw_folder_path = '../data/raw/'
+        file_name = get_first_file_name(raw_folder_path)
+        players_path = raw_folder_path + file_name
+
+        # load the data into a dataframe
         players_df = load_data(players_path)
 
         # remove duplicate rows
@@ -110,12 +116,17 @@ def clean_and_transform_data():
         logging.info(f'Number of rows after dropping NA values: {num_rows_after}')
         logging.info(f'Number of rows dropped: {num_rows_dropped}')
 
-        transformed_df_path = '../data/processed/fb_ref_players_processed.csv'
+        processed_folder_path = '../data/processed/'
+        file_name = file_name.split('.csv')[0]
+        transformed_df_path = processed_folder_path + file_name + '_processed.csv'
 
         # Store the transformed df to the processed folder
-
         players_df.to_csv(transformed_df_path)
         logging.info(f'Successfully stored the data in data/processed')
+
+        # archive raw file after it's been processed
+        archive_path = '../data/archive'
+        send_file_to_archive(players_path, archive_path)
 
     except Exception as e:
         logging.error(f'An unexpected error occurred while processing the data: {e}')

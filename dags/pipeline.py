@@ -13,9 +13,9 @@ default_args = {
 with DAG(
         dag_id='pipeline',
         default_args=default_args,
-        # schedule_interval='0 8 * * 2',
-        # catchup=False,
-        # start_date=datetime(2024, 7, 20)
+        schedule_interval='0 8 * * 2',
+        catchup=False,
+        start_date=datetime(2024, 7, 20)
 ) as dag:
 
     clean_data_task = PythonOperator(
