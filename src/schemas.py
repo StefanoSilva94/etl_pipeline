@@ -5,7 +5,7 @@ from datetime import date
 class PlayerStats(BaseModel):
     player: str
     position: str
-    age: int
+    age: str
     minutes: int
     goals: int
     assists: int

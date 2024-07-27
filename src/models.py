@@ -1,4 +1,4 @@
-from .database import Base
+from database import Base
 from sqlalchemy import Float, Column, Integer, String, Date
 
 
@@ -7,7 +7,7 @@ class PlayerStatsDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     player = Column(String, index=True)
     position = Column(String)
-    age = Column(Integer)
+    age = Column(String)
     minutes = Column(Integer)
     goals = Column(Integer)
     assists = Column(Integer)
@@ -24,8 +24,8 @@ class PlayerStatsDB(Base):
     xg = Column(Float)
     npxg = Column(Float)
     xg_assist = Column(Float)
-    sca = Column(Float)
-    gca = Column(Float)
+    shot_creating_actions = Column(Float)
+    goal_creating_actions = Column(Float)
     passes = Column(Integer)
     passes_pct = Column(Float)
     progressive_passes = Column(Integer)

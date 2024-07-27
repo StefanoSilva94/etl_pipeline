@@ -10,17 +10,16 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-
 with DAG(
-        dag_id='scrape_player_data',
+        dag_id='pipeline',
         default_args=default_args,
-        schedule_interval='0 8 * * 2',
-        catchup=False,
-        start_date=datetime(2024, 7, 20)
-         ) as dag:
+        # schedule_interval='0 8 * * 2',
+        # catchup=False,
+        # start_date=datetime(2024, 7, 20)
+) as dag:
 
     clean_data_task = PythonOperator(
-        task_id='scrape_player_data_task',
+        task_id='clean_data_task',
         python_callable=clean_and_transform_data
     )
 
@@ -29,6 +28,5 @@ with DAG(
         python_callable=load_data_to_tables
     )
 
-
-clean_data_task >> clean_data_task
-
+    # Set task dependencies
+    clean_data_task >> load_player_data_task

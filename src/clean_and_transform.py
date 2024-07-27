@@ -1,6 +1,13 @@
 import pandas as pd
-# from airflow import Variable
+from airflow.models import Variable
 import logging
+import os
+import json
+from sqlalchemy.exc import SQLAlchemyError
+from models import PlayerStatsDB
+from database import engine
+from sqlalchemy.orm import Session
+
 
 # Set up logging configuration
 logging.basicConfig(
@@ -44,25 +51,58 @@ def standardise_positions(df, mappings_dict):
 
 
 def rename_cols(df, col_map):
+    try:
+        # Check if all columns in col_map exist in df
+        missing_cols = [col for col in col_map.keys() if col not in df.columns]
+        if missing_cols:
+            raise ValueError(f"Columns {missing_cols} are not present in the DataFrame.")
+
+        # Rename columns
+        df.rename(columns=col_map, inplace=True)
+        logging.info('Renamed columns according to the provided mapping.')
+
+    except ValueError as ve:
+        logging.error(f'ValueError occurred during column renaming: {ve}')
+        raise
+    except KeyError as ke:
+        logging.error(f'KeyError occurred during column renaming: {ke}')
+        raise
     logging.info('Renamed columns')
-    return df.rename(columns=col_map, inplace=True)
+
+    return df
 
 
 def clean_and_transform_data():
+    current_path = os.getcwd()
+
+    print(f'Current working directory: {current_path}')
+    print(f'Current working directory: {current_path}')
+
     try:
-        players_path = f'../data/fb_ref_players_2023_2024.csv'
+        players_path = f'../data/raw/fb_ref_players_2023_2024.csv'
         players_df = load_data(players_path)
 
         # remove duplicate rows
         players_df = players_df.drop_duplicates()
 
+        # load the position mappings from Airflow Variables
+        position_mappings_json = Variable.get('position_mappings')
+        position_mappings = json.loads(position_mappings_json)
+
         # standardise player positions and rename them
-        position_mappings = Variable.get('position_mappings')
         players_df = standardise_positions(players_df, position_mappings)
 
         # Add new columns goal involvement and x_goal_involvement
         players_df["goal_involvements"] = players_df["goals"] + players_df["assists"]
         players_df["xg_involvements"] = players_df["xg"] + players_df["xg_assist"]
+
+        # rename sca and gca to be more readable
+        rename_col_mappings = {
+            'sca': 'shot_creating_actions',
+            'gca': 'goal_creating_actions',
+        }
+        # rename_col_mappings = Variable.get('rename_col_mappings')
+        players_df = rename_cols(players_df, rename_col_mappings)
 
         num_rows_before = len(players_df)
         logging.info(f'Number of rows before dropping NA values: {num_rows_before}')
@@ -70,18 +110,19 @@ def clean_and_transform_data():
         players_df = players_df.dropna()
 
         num_rows_after = len(players_df)
-        num_rows_dropped = players_df - num_rows_after
+        num_rows_dropped = num_rows_before - num_rows_after
         logging.info(f'Number of rows after dropping NA values: {num_rows_after}')
         logging.info(f'Number of rows dropped: {num_rows_dropped}')
 
         transformed_df_path = '../data/processed/fb_ref_players_processed.csv'
 
         # Store the transformed df to the processed folder
+
         players_df.to_csv(transformed_df_path)
         logging.info(f'Successfully stored the data in data/processed')
 
     except Exception as e:
-        logging.error(f'An unexpected error occurred while renaming columns: {e}')
+        logging.error(f'An unexpected error occurred while processing the data: {e}')
         raise
 
 
