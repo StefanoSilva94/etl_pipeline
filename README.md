@@ -2,14 +2,40 @@
 
 ## Project Overview
 
-This project implements a reproducible ETL (Extract, Transform, Load) pipeline to process weekly influenza data sourced from the WHO. The pipeline is orchestrated using Apache Airflow and performs the following tasks:
+This project implements an ETL (Extract, Transform, Load) pipeline designed to process player data from CSV files related to Premier League match gameweeks. The pipeline utilizes Airflow as the orchestrator, PostgreSQL as the database, and SQLAlchemy for ORM. 
 
-1. **Download**: Retrieve the latest weekly influenza data in CSV format.
-2. **Read and Clean**: Load the CSV file into a Pandas DataFrame and perform data cleaning.
-3. **Transform**: Aggregate and engineer features to prepare the data for analysis.
-4. **Load**: Store the cleaned and transformed data in a PostgreSQL database.
-5. **EDA**: Conduct exploratory data analysis (EDA) to understand the data characteristics.
-6. **Visualization**: Generate visualizations to present the data insights.
+## Architecture
+
+### Components
+
+- **Airflow**: Manages and schedules ETL workflows using Directed Acyclic Graphs (DAGs). It is set up to trigger the pipeline after each gameweek using cron scheduling.
+  
+- **PostgreSQL**: Stores the transformed data. SQLAlchemy is used to define the database models and handle database interactions.
+  
+- **SQLAlchemy**: An Object-Relational Mapping (ORM) tool used to interact with the PostgreSQL database.
+  
+- **Python Modules**: Includes modules for data manipulation, transformation, and loading.
+  
+- **Testing Framework**: Uses pytest for unit testing to ensure the reliability of the code.
+  
+- **Alembic**: Utilized for database schema management and migrations. It ensures that the database schema evolves correctly with application changes by generating and applying migration scripts.
+
+## Workflow
+
+1. **Extraction**:
+   The pipeline extracts data from CSV files placed in the `data/raw/` directory.
+  
+2. **Transformation**:
+   Data is cleaned, positions are standardized, columns are renamed, and new columns are added as required.
+  
+3. **Loading**:
+   Transformed data is loaded into the PostgreSQL database using SQLAlchemy.
+  
+4. **File Management**:
+    The processed file is moved to the `data/archived/` directory and archived.
+  
+5. **Orchestration**:
+     Airflow triggers the ETL process based on a predefined schedule (e.g., after every gameweek).
 
 
 ## Setup and Installation
@@ -19,7 +45,6 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
 - Python 3.8+ (required for Airflow)
 - PostgreSQL
 - Apache Airflow
-- Docker (optional, for containerization)
 
 ### Installation Steps
 
@@ -40,11 +65,20 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
    Follow the Airflow documentation: https://airflow.apache.org/docs/apache-airflow/stable/start.html
 
 4. **Configure PostgreSQL**
-   Set up a PostgreSQL instance and add the database details to config/config.yaml
+   Set up a PostgreSQL instance and upgrade to the latest version of the database by running:
+   ```bash
+   alembic upgrade head
+   
+5. **Configure Environment Variables**
+   A config file is used to load enviornment variables. Set up your .env file to match the variables shown in config.py
 
-5. **Run the pipeline**
-   Start Airflow and trigger the weekly_influenza_etl DAG to run the pipeline:
+6. **Run the pipeline**
+   Start Airflow and trigger the pipeline DAG:
 
    ```bash
-   airflow webserver -p 8080
-   airflow scheduler
+   airflow standalone
+
+
+   Alternatively, the code can be run locally by running src/clean_and_transform.py and then running src/load.py
+
+   
