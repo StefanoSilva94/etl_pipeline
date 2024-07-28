@@ -5,6 +5,7 @@ from models import PlayerStatsDB
 from database import engine
 from sqlalchemy.orm import Session
 from utils.utils import get_first_file_name, send_file_to_archive
+import os
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -43,6 +44,9 @@ def insert_data_to_db(df: pd.DataFrame):
 
 def load_data_to_tables():
     # Load processed data into dataframe
+    print(f"PYTHONPATH is: {os.environ.get('PYTHONPATH')}")
+    current_working_directory = os.getcwd()
+    print(f"Current working directory is: {current_working_directory}")
     logging.info('Starting the process to load data into tables')
     try:
         # construct the file path

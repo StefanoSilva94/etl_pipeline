@@ -70,10 +70,6 @@ def rename_cols(df, col_map):
 
 
 def clean_and_transform_data():
-    current_path = os.getcwd()
-
-    print(f'Current working directory: {current_path}')
-    print(f'Current working directory: {current_path}')
 
     try:
         # construct the file path
@@ -89,6 +85,25 @@ def clean_and_transform_data():
 
         # load the position mappings from Airflow Variables
         position_mappings_json = Variable.get('position_mappings')
+
+        # if run locally:
+        # position_mappings = {
+        #     "GK": "GK",
+        #     "LB": "DEF",
+        #     "CB": "DEF",
+        #     "RB": "DEF",
+        #     "WB": "DEF",
+        #     "DF": "DEF",
+        #     "CM": "MID",
+        #     "DM": "MID",
+        #     "MF": "MID",
+        #     "LM": "MID",
+        #     "RM": "MID",
+        #     "LW": "ATT",
+        #     "RW": "ATT",
+        #     "AM": "ATT",
+        #     "FW": "ATT"
+        # }
         position_mappings = json.loads(position_mappings_json)
 
         # standardise player positions and rename them
@@ -99,11 +114,13 @@ def clean_and_transform_data():
         players_df["xg_involvements"] = players_df["xg"] + players_df["xg_assist"]
 
         # rename sca and gca to be more readable
-        rename_col_mappings = {
-            'sca': 'shot_creating_actions',
-            'gca': 'goal_creating_actions',
-        }
-        # rename_col_mappings = Variable.get('rename_col_mappings')
+        rename_col_mappings = Variable.get('rename_col_mappings')
+        # if run locally:
+        # rename_col_mappings = {
+        #     'sca': 'shot_creating_actions',
+        #     'gca': 'goal_creating_actions',
+        # }
+
         players_df = rename_cols(players_df, rename_col_mappings)
 
         num_rows_before = len(players_df)

@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from src.scrape_player_data import scrape_player_data
 
 
+"""
+This is a boiler plater dag and is used as an example of how the data would be scraped
+"""
+
 default_args = {
     'owner': 'airflow',
     'retries': 1,

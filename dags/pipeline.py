@@ -28,5 +28,4 @@ with DAG(
         python_callable=load_data_to_tables
     )
 
-    # Set task dependencies
     clean_data_task >> load_player_data_task
