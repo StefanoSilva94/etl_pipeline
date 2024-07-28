@@ -19,7 +19,6 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
 - Python 3.8+ (required for Airflow)
 - PostgreSQL
 - Apache Airflow
-- Docker (optional, for containerization)
 
 ### Installation Steps
 
@@ -40,11 +39,20 @@ This project implements a reproducible ETL (Extract, Transform, Load) pipeline t
    Follow the Airflow documentation: https://airflow.apache.org/docs/apache-airflow/stable/start.html
 
 4. **Configure PostgreSQL**
-   Set up a PostgreSQL instance and add the database details to config/config.yaml
+   Set up a PostgreSQL instance and upgrade to the latest version of the database by running:
+   ```bash
+   alembic upgrade head
+   
+5. **Configure Environment Variables**
+   A config file is used to load enviornment variables. Set up your .env file to match the variables shown in config.py
 
-5. **Run the pipeline**
-   Start Airflow and trigger the weekly_influenza_etl DAG to run the pipeline:
+6. **Run the pipeline**
+   Start Airflow and trigger the pipeline DAG:
 
    ```bash
-   airflow webserver -p 8080
-   airflow scheduler
+   airflow standalone
+
+
+   Alternatively, the code can be run locally by running src/clean_and_transform.py and then running src/load.py
+
+   
